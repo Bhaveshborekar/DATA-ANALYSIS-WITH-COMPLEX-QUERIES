@@ -1,0 +1,143 @@
+TASK 2:
+•	CREATE TABLE STUDENT:-
+CREATE TABLE students (
+student_id INT PRIMARY KEY,
+name VARCHAR(100),
+score INT,
+class VARCHAR(50),
+exam_date DATE
+);
+•	INSERTING THE DATA IN TABLE:-
+INSERT INTO students (student_id, name, score, class, exam_date)
+VALUES
+(1, 'Bhavesh', 85, 'Math', '2025-01-15'),
+(2, 'Sushil', 78, 'Math', '2025-01-15'),
+(3, 'Payal', 92, 'Math', '2025-01-15'),
+(4, 'Avira', 75, 'Science', '2025-01-16'),
+(5, 'Chhaku', 82, 'Science', '2025-01-16'),
+(6, 'Pranali', 82, 'Math', '2025-01-20'),
+(7, 'Tanu', 91, 'Math', '2025-01-20'); 
+
+•	PERFORM ADVANCED DATA ANALYSIS:- Rank Students by Score in Each Class
+SELECT student_id,
+name,
+score,
+class,
+RANK() OVER (PARTITION BY class ORDER BY score DESC) AS rank_within_class
+FROM students;
+ 
+•	SUBQUERY EXAMPLE:- Find Students Who Scored Above the Average in Their Class
+SELECT student_id,
+name,
+score,
+class
+FROM students
+WHERE score > (
+SELECT AVG(score)
+FROM students
+WHERE class = students.class
+);
+ 
+•	COMMON TABLE EXPRESSION (CTE): Top 3 Students by Score in Each Class
+WITH ranked_students AS (
+SELECT student_id,
+name,
+score,
+class,
+RANK() OVER (PARTITION BY class ORDER BY score DESC) AS rank_within_class
+FROM students
+)
+SELECT student_id,
+name,
+score,
+class
+FROM ranked_students
+WHERE rank_within_class <= 3;
+ 
+•	WINDOW FUNCTION :-  Calculate Cumulative Score for Each Student
+SELECT student_id,
+name,
+score,
+exam_date,
+SUM(score) OVER (PARTITION BY student_id ORDER BY exam_date) AS cumulative_score
+FROM students;
+ 
+•	SUBQEURY:-  Find Students Who Scored Above the Overall Average Score
+SELECT student_id,
+name,
+score,
+class
+FROM students
+WHERE score > (
+SELECT AVG(score)
+FROM students
+);
+ 
+
+•	CTE AND WINDOW FUNCTION:- Find Students Who Scored Above the Class Average and Rank Them.
+WITH class_avg_score AS (
+SELECT class,
+AVG(score) AS avg_score
+FROM students
+GROUP BY class
+)
+SELECT s.student_id,
+s.name,
+s.score,
+s.class,
+RANK() OVER (PARTITION BY s.class ORDER BY s.score DESC) AS rank_within_class
+FROM students s
+JOIN class_avg_score cas
+ON s.class = cas.class
+WHERE s.score > cas.avg_score;
+ 
+•	Find the Best Scorer in Each Class Using SUBQEURY
+SELECT student_id,
+name,
+score,
+class
+FROM students
+WHERE (class, score) IN (
+SELECT class, MAX(score)
+FROM students
+GROUP BY class
+);
+
+DESCRIPTION 
+
+This SQL script demonstrates various advanced data analysis techniques using a STUDENTS table. Here's a brief breakdown of the queries:
+1. Creating the Students Table:
+•	The students table is created with the following columns: 
+o	student_id (Primary Key)
+o	name (Student Name)
+o	score (Exam Score)
+o	class (Subject/Exam Class)
+o	exam_date (Date of the Exam)
+2. Inserting Data:
+•	Data for 7 students is inserted, each with a student_id, name, score, class, and exam date.
+3. Advanced Data Analysis Queries:
+•	Rank Students by Score in Each Class:
+o	RANK() window function ranks students within each class based on their score in descending order. Tied students receive the same rank.
+•	Subquery Example (Above Class Average):
+o	This query uses a subquery to find students who scored above the average score in their respective class.
+•	Common Table Expression (CTE) - Top 3 Students by Score in Each Class:
+o	A CTE is used to rank students within each class, then select the top 3 ranked students in each class.
+•	Window Function - Cumulative Score for Each Student:
+o	The SUM() window function calculates the cumulative score for each student, ordered by exam date.
+•	Subquery - Students Above Overall Average Score:
+o	A subquery is used to find students who scored above the overall average score across all students.
+•	CTE and Window Function - Students Above Class Average with Ranking:
+o	A CTE calculates the class average score, and the RANK() function ranks students who scored above the class average, within their class.
+•	Subquery - Best Scorer in Each Class:
+o	A subquery identifies the highest score for each class, and then the main query finds the students with that score, i.e., the best scorer(s).
+Summary:
+•	RANK() and SUM() window functions help in ranking students and calculating cumulative scores.
+•	Subqueries find students who scored above averages, both for their class and overall.
+•	Common Table Expressions (CTEs) simplify complex queries like selecting top scorers and filtering students based on averages.
+
+OUTPUT:
+
+
+
+
+
